@@ -49,6 +49,7 @@ public class ListaMensajes extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list);
 
+        //Comprobación de conexión
         IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
         receptor = new ReceptorXarxa();
         this.registerReceiver(receptor, filter);
@@ -63,8 +64,8 @@ public class ListaMensajes extends AppCompatActivity {
         map.put("nom", user);
         map.put("password", passw);
 
-        new DescargarMensaje().execute(url);
-        //CridadaGet(url, map);
+        //new DescargarMensaje().execute(url);
+        CridadaGet(url, map);
 
     }
 
@@ -88,6 +89,7 @@ public class ListaMensajes extends AppCompatActivity {
                 httpConn.setReadTimeout(15000);
                 httpConn.setConnectTimeout(25000);
                 httpConn.setRequestMethod("GET");
+                //httpConn.setRequestProperty("Authorization", token);
                 httpConn.setDoInput(true);
                 httpConn.setDoOutput(true);
 
@@ -140,6 +142,9 @@ public class ListaMensajes extends AppCompatActivity {
                     HashMap<String, Object> map = new HashMap<>();
                     JSONObject jsonObjectTemp = jsonArray.getJSONObject(i);
                     map.put("MISSATGE",jsonObjectTemp.getString("missatge"));
+                    map.put("MISSATGE",jsonObjectTemp.getString("missatge"));
+                    map.put("MISSATGE",jsonObjectTemp.getString("missatge"));
+
                     llista.add(map);
                 }
 
@@ -153,69 +158,6 @@ public class ListaMensajes extends AppCompatActivity {
                 e.printStackTrace();
             }
         }
-    }
-
-    public String CridadaGet(String adrecaURL, HashMap<String, String> parametres) {
-        String resultat = "";
-        try {
-            URL url = new URL(adrecaURL);
-            Log.i("ResConnectUtils", "Connectant" + adrecaURL);
-
-            HttpsURLConnection httpConn = (HttpsURLConnection) url.openConnection();
-            httpConn.setReadTimeout(15000);
-            httpConn.setConnectTimeout(25000);
-            httpConn.setRequestMethod("GET");
-            httpConn.setDoInput(true);
-            httpConn.setDoOutput(true);
-
-            OutputStream os = httpConn.getOutputStream();
-            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
-            writer.write(montaParametres(parametres));
-            writer.flush();
-            writer.close();
-            os.close();
-
-            int resposta = httpConn.getResponseCode();
-            if (resposta == HttpsURLConnection.HTTP_OK) {
-                String line;
-                BufferedReader br=new BufferedReader(new InputStreamReader(httpConn.getInputStream()));
-
-                while ((line=br.readLine()) != null) {
-                    resultat+=line;
-                }
-                Log.i("ResConnectUtils", resultat);
-            } else {
-                resultat="";
-            }
-            Log.i("ResConnectUtils","Errors:"+resposta);
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        } catch (ProtocolException e) {
-            e.printStackTrace();
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return resultat;
-    }
-
-    private String montaParametres(HashMap<String, String> params) throws UnsupportedEncodingException {
-        // A partir d'un hashmap clau-valor cream
-        // clau1=valor1&clau2=valor2&...
-        StringBuilder result = new StringBuilder();
-        boolean first = true;
-        for(Map.Entry<String, String> entry : params.entrySet()){
-            if (first) {
-                first = false;
-            } else {
-                result.append("&");
-            }
-            result.append(URLEncoder.encode(entry.getKey(), "UTF-8"));
-            result.append("=");
-            result.append(URLEncoder.encode(entry.getValue(), "UTF-8"));
-        }
-        return result.toString();
     }
 
     public void onDestroy() {

@@ -1,6 +1,8 @@
 package com.example.alumne.missatgeria;
 
+import android.content.SharedPreferences;
 import android.os.StrictMode;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
@@ -37,14 +39,19 @@ import javax.net.ssl.HttpsURLConnection;
 
 public class MainActivity extends AppCompatActivity {
     private ReceptorXarxa receptor;
-    private Preferencies preferencias;
+    private SharedPreferences.Editor editor;
+    private SharedPreferences preferences;
     private EditText usuario, contraseña;
     private Button btn_login;
+    private static boolean ejecutado = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        editor = preferences.edit();
 
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
@@ -67,10 +74,14 @@ public class MainActivity extends AppCompatActivity {
                 map.put("nom", user);
                 map.put("password", passw);
 
-                preferencias.setUser(user);
-                preferencias.setPassword(passw);
-
                 CridadaPost(url, map);
+                if (ejecutado == true){
+                    editor.putString("user",user);
+                    editor.putString("password", passw);
+                    editor.apply();
+                    Intent intent = new Intent(v.getContext(), ListaMensajes.class);
+                    startActivity(intent);
+                }
             }
         });
     }
@@ -124,6 +135,7 @@ public class MainActivity extends AppCompatActivity {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        ejecutado = true;
         return resultat;
     }
 
